@@ -7,8 +7,8 @@ public class Note {
 
     private String summary;
     private String body;
-    private String startTimestamp;
-    private String endTimeStamp;
+
+    private Interval interval;
 
     private String dateCreated;
     private String dateModified;

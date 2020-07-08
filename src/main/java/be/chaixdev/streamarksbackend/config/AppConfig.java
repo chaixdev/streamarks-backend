@@ -36,10 +36,10 @@ public class AppConfig {
     public Database database(CloudantClient client, CouchdbProperties properties) throws IOException {
         List<String> allDbs = client.getAllDbs();
 
-
-
         Database database = client.database(properties.getDbname(), true);
         verifyDesignDocs(database);
+
+
         return database;
     }
 

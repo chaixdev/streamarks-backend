@@ -2,6 +2,7 @@ package be.chaixdev.streamarksbackend.repository;
 
 import com.cloudant.client.api.Database;
 import com.cloudant.client.api.model.Document;
+import com.cloudant.client.api.model.Response;
 import com.cloudant.client.api.views.*;
 import org.springframework.stereotype.Repository;
 import be.chaixdev.streamarksbackend.model.*;
@@ -43,5 +44,10 @@ public class TopicRepository{
     public Topic update(Topic topic){
         db.update(topic);
         return getTopic(topic.getId());
+    }
+    
+    public Response delete(String id, String rev){
+        return db.remove(id, rev);
+        
     }
 }

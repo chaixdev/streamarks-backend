@@ -1,7 +1,4 @@
-package be.chaixdev.streamarksbackend.rest.dto;
-
-import be.chaixdev.streamarksbackend.model.Note;
-import be.chaixdev.streamarksbackend.model.Subject;
+package be.chaixdev.streamarksbackend.rest.topic.dto;
 
 import java.util.List;
 import java.util.Set;
