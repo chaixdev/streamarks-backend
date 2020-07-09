@@ -4,5 +4,5 @@ import java.util.List;
 
 public abstract class Validator<T> {
 
-    public abstract List<ValidationError> getValidationErrors(T toValidate);
+    public abstract List<ValidationError> validate(T toValidate);
 }

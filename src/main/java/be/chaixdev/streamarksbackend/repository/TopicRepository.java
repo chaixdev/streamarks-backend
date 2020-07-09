@@ -1,10 +1,12 @@
 package be.chaixdev.streamarksbackend.repository;
 
+import be.chaixdev.streamarksbackend.rest.common.NotFoundException;
 import com.cloudant.client.api.Database;
 import com.cloudant.client.api.model.Document;
 import com.cloudant.client.api.model.Response;
 import com.cloudant.client.api.views.*;
 import com.cloudant.client.org.lightcouch.DocumentConflictException;
+import com.cloudant.client.org.lightcouch.NoDocumentException;
 import org.springframework.stereotype.Repository;
 import be.chaixdev.streamarksbackend.model.*;
 
@@ -13,12 +15,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static be.chaixdev.streamarksbackend.Utils.getNow;
+import static be.chaixdev.streamarksbackend.utils.UUIDUtil.shortUUID;
+import static be.chaixdev.streamarksbackend.utils.Utils.getNow;
 
 @Repository
 public class TopicRepository{
 
-    private Database db;
+    private final Database db;
 
     public TopicRepository(Database db) {
 
@@ -27,22 +30,26 @@ public class TopicRepository{
 
     // crud to couch
     public List<Topic> getAllTopics() throws IOException {
-        ViewRequest<String, String> viewrequest = db.getViewRequestBuilder("topic", "byUser")
+        ViewRequest<String, String> viewrequest = db.getViewRequestBuilder("Topic", "byUser")
                 .newRequest(Key.Type.STRING, String.class)
                 .includeDocs(true).build();
 
         ViewResponse<String, String> response = viewrequest.getResponse();
-        List<Document> docs = response.getDocs();
+
         return response.getRows().stream().map(row-> row.getDocumentAsType(Topic.class)).collect(Collectors.toList());
 
     }
 
     public Topic getTopic(String id){
-        return db.find(Topic.class, id);
+        try{
+            return db.find(Topic.class, id);
+        } catch(NoDocumentException nde){
+            throw new NotFoundException(String.format("Topic %s not found", id));
+        }
     }
 
     public Topic save(Topic topic){
-
+        topic.setId(shortUUID());
         topic.setDateCreated(getNow());
         topic.setDateModified(getNow());
 
@@ -80,7 +87,10 @@ public class TopicRepository{
     }
 
     private String getLatestRevisionForDocument(String id){
-        Document document = db.find(Document.class, id);
-        return document.getRevision();
+        try{
+            return db.find(Document.class, id).getRevision();
+        } catch(NoDocumentException nde){
+            throw new NotFoundException(String.format("Document %s not found", id));
+        }
     }
 }

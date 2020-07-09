@@ -1,10 +1,12 @@
 package be.chaixdev.streamarksbackend.rest.note;
 
 import be.chaixdev.streamarksbackend.model.Note;
-import be.chaixdev.streamarksbackend.model.Topic;
-import be.chaixdev.streamarksbackend.repository.NoteRepository;
-import be.chaixdev.streamarksbackend.repository.TopicRepository;
+import be.chaixdev.streamarksbackend.rest.common.ValidationError;
+import be.chaixdev.streamarksbackend.rest.note.validators.AppendNoteValidator;
+import be.chaixdev.streamarksbackend.service.NoteService;
 import com.cloudant.client.api.model.Response;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,62 +15,63 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static be.chaixdev.streamarksbackend.rest.common.ApiResponse.*;
+
 @RestController
-@RequestMapping(path="topic/{id}/note")
+@RequestMapping(path="topic/{topicId}/note")
 public class NoteController {
 
-    private NoteRepository noteRepo;
+    private NoteService service;
 
-    public NoteController(NoteRepository noteRepo) {
-        this.noteRepo = noteRepo;
+    public NoteController(NoteService service) {
 
+        this.service = service;
     }
 
     /* CREATE */
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Topic>> newTopic(@RequestBody Topic topic) throws IOException {
+    public ResponseEntity append(@PathVariable String topicId,@RequestParam String rev,@RequestBody Note note) throws IOException {
 
-        String datetime = getNow();
-        topic.setDateCreated(datetime);
-        topic.setDateModified(datetime);
+        List<ValidationError> errors = new AppendNoteValidator().validate(note);
 
-        topic.setNotes(new ArrayList<>());
-        topics.save(topic);
-        return ResponseEntity.ok(topics.getAllTopics());
+        if(!errors.isEmpty()){
+            return errorResponseEntity(HttpStatus.BAD_REQUEST, errors);
+        }
+
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .header(
+                        HttpHeaders.LOCATION,
+                        String.format("/topic/%s/note/%s",topicId,note.getId()))
+                .body(service.append(topicId, note));
     }
 
     /* READ all */
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Topic>> getAll() throws IOException {
-
-        return ResponseEntity.ok(topics.getAllTopics());
-    }
-
-    /* READ one */
-    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Topic> getOne(@PathVariable String id) throws IOException {
-        return ResponseEntity.ok(topics.getTopic(id));
+    public ResponseEntity<List<Note>> getAll(@PathVariable String topicId) throws IOException {
+        return ResponseEntity.ok(service.getNotesForTopic(topicId));
     }
 
     /* UPDATE one*/
-    @PutMapping(value = "/{id}/note", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Topic> addNoteToTopic(@PathVariable String id, @RequestBody Note note) throws IOException {
-
-        note.setDateCreated(getNow());
-        note.setDateModified(getNow());
-        if(note.getEndTimeStamp()==null){
-            note.setEndTimeStamp(note.getStartTimestamp());
+    @PutMapping(value = "/{noteId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Note> update(@PathVariable String topicId, @PathVariable String noteId, @RequestBody Note note) throws IOException {
+        List<ValidationError> errors = new ArrayList<>();
+        if(!noteId.equals(note.getId())){
+            errors.add(new ValidationError("id", "The note id in request path and id in request body don't match."));
         }
-        Topic topic = topics.getTopic(id);
-        topic.addNote(note);
 
-        return ResponseEntity.ok(topics.update(topic));
+        if(!errors.isEmpty()){
+            return errorResponseEntity(HttpStatus.BAD_REQUEST, errors);
+        }
+
+        return ResponseEntity.ok(service.update(topicId, note));
+
     }
 
     /* DELETE one */
-    @DeleteMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Response> deleteTopic(@PathVariable String id, @RequestParam String rev) throws IOException {
-
-        return ResponseEntity.ok(topics.delete(id, rev));
+    @DeleteMapping(value = "/{noteId}", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity deleteNote(@PathVariable String topicId, @PathVariable String noteId) throws IOException {
+        service.delete(topicId, noteId);
+        return ResponseEntity.ok().build();
     }
 }

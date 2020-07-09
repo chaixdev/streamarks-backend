@@ -43,4 +43,15 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
                 .header(HttpHeaders.CONTENT_TYPE, "application/json")
                 .body(response);
     }
+
+    @ExceptionHandler(value = {NotFoundException.class})
+    protected ResponseEntity notFoundException(Exception ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("error", ex.getMessage());
+
+        log.warn("{}", ex.getMessage(), ex);
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .header(HttpHeaders.CONTENT_TYPE, "application/json")
+                .body(response);
+    }
 }

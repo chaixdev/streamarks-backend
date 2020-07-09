@@ -1,4 +1,4 @@
-package be.chaixdev.streamarksbackend;
+package be.chaixdev.streamarksbackend.utils;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;

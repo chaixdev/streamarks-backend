@@ -4,12 +4,9 @@ import lombok.Data;
 
 @Data
 public class Note {
+    private String id;
 
-    private String summary;
+    private String title;
     private String body;
-
     private Interval interval;
-
-    private String dateCreated;
-    private String dateModified;
 }
