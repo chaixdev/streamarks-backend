@@ -11,5 +11,5 @@ public class User {
 
     private String email;
     private List<Topic> topics;
-    private Set<Tag> userDefinedTags;
+    private Set<String> userDefinedTags;
 }

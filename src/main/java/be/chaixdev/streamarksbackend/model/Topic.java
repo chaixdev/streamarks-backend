@@ -12,7 +12,7 @@ public class Topic extends Document {
     private final String type = "Topic";
     private Subject subject;
 
-    private List<Tag> tag;
+    private List<String> tag;
     private List<Note> notes;
 
     private String dateCreated;
