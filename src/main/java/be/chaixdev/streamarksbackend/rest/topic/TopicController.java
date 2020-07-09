@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static be.chaixdev.streamarksbackend.Utils.getNow;
 import static be.chaixdev.streamarksbackend.rest.common.ApiResponse.*;
 
 @RestController
@@ -27,26 +28,19 @@ public class TopicController {
     private TopicRepository topics;
 
     public TopicController(TopicRepository topics) {
+
         this.topics = topics;
     }
     
     /* CREATE */
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<List<Topic>> newTopic(@RequestBody Topic topic) throws IOException {
-
-        String datetime = getNow();
-        topic.setDateCreated(datetime);
-        topic.setDateModified(datetime);
-
-        topic.setNotes(new ArrayList<>());
-        topics.save(topic);
-        return ResponseEntity.ok(topics.getAllTopics());
+    public ResponseEntity<Topic> newTopic(@RequestBody Topic topic) throws IOException {
+        return ResponseEntity.ok(topics.save(topic));
     }
 
     /* READ all */
     @GetMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<Topic>> getAll() throws IOException {
-
         return ResponseEntity.ok(topics.getAllTopics());
     }
 
@@ -58,21 +52,7 @@ public class TopicController {
 
     /* UPDATE one*/
     @PutMapping(value = "/{id}/note", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity addNoteToTopic(@PathVariable String id, @RequestBody Note note) throws IOException {
-
-        if(note.getInterval()==null){
-            return errorResponseEntity(
-                    HttpStatus.BAD_REQUEST,
-                    Collections.singletonList(new ValidationError("$.interval", "interval can not be missing"))
-            );
-        }
-
-        Topic topic = topics.getTopic(id);
-
-        note.setDateCreated(getNow());
-        note.setDateModified(getNow());
-
-        topic.addNote(note);
+    public ResponseEntity update(@PathVariable String id, @RequestBody Topic topic) throws IOException {
 
         return ResponseEntity.ok(topics.update(topic));
     }
@@ -82,10 +62,5 @@ public class TopicController {
     public ResponseEntity<Response> deleteTopic(@PathVariable String id, @RequestParam String rev) throws IOException {
 
         return ResponseEntity.ok(topics.delete(id, rev));
-    }
-
-    private String getNow() {
-        DateTimeFormatter isoInstant = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ssZ");
-        return ZonedDateTime.now().format(isoInstant);
     }
 }
