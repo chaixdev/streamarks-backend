@@ -1,5 +1,5 @@
 {
-  "_id": "_design/topic",
+  "_id": "_design/Topic",
   "views": {
     "byUser": {
       "map": "function (doc) {\n  emit(doc._id, 1);\n}"

@@ -30,7 +30,7 @@ public class NoteController {
 
     /* CREATE */
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity append(@PathVariable String topicId,@RequestParam String rev,@RequestBody Note note) throws IOException {
+    public ResponseEntity append(@PathVariable String topicId,@RequestBody Note note) throws IOException {
 
         List<ValidationError> errors = new AppendNoteValidator().validate(note);
 

@@ -36,7 +36,7 @@ public class NoteService {
         Topic topic = repository.getTopic(topicId);
         note.setId(shortUUID());
         topic.getNotes().add(note);
-        repository.save(topic);
+        repository.update(topic);
         return getNote(topicId, note.getId());
     }
 

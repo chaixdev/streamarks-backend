@@ -48,7 +48,7 @@ public class TopicController {
     }
 
     /* UPDATE one*/
-    @PutMapping(value = "/{id}/note", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity update(@PathVariable String id, @RequestBody Topic topic) throws IOException {
 
         return ResponseEntity.ok(topics.update(topic));

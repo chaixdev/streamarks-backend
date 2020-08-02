@@ -18,7 +18,7 @@ public class Topic extends Document {
     private String dateCreated;
     private String dateModified;
 
-    private List<String> folderPath;
+//    private List<String> folderPath;
 
     public void addNote(Note note){
         this.getNotes().add(note);

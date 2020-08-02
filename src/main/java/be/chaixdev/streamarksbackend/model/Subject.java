@@ -11,6 +11,6 @@ public class Subject {
     private Type type;
     private String uri;
     private String subjectTitle;
-    private Duration duration;
+//    private Duration duration;
 
 }
