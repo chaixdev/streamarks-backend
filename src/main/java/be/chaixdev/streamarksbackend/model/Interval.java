@@ -4,6 +4,6 @@ import lombok.Data;
 
 @Data
 public class Interval {
-    private String start;
-    private String end;
+    private long start;
+    private long end;
 }

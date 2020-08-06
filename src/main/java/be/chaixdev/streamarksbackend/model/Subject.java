@@ -10,7 +10,7 @@ public class Subject {
 
     private Type type;
     private String uri;
-    private String subjectTitle;
-//    private Duration duration;
+    private String title;
+    private long duration;
 
 }

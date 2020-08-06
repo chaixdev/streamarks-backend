@@ -2,7 +2,6 @@ package be.chaixdev.streamarksbackend.rest.note;
 
 import be.chaixdev.streamarksbackend.model.Note;
 import be.chaixdev.streamarksbackend.rest.common.ValidationError;
-import be.chaixdev.streamarksbackend.rest.note.validators.AppendNoteValidator;
 import be.chaixdev.streamarksbackend.service.NoteService;
 import com.cloudant.client.api.model.Response;
 import org.springframework.http.HttpHeaders;
@@ -31,12 +30,6 @@ public class NoteController {
     /* CREATE */
     @PostMapping(value = "/", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity append(@PathVariable String topicId,@RequestBody Note note) throws IOException {
-
-        List<ValidationError> errors = new AppendNoteValidator().validate(note);
-
-        if(!errors.isEmpty()){
-            return errorResponseEntity(HttpStatus.BAD_REQUEST, errors);
-        }
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)

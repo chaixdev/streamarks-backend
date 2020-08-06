@@ -1,6 +1,7 @@
 package be.chaixdev.streamarksbackend.repository;
 
 import be.chaixdev.streamarksbackend.rest.common.NotFoundException;
+import be.chaixdev.streamarksbackend.utils.UUIDUtil;
 import com.cloudant.client.api.Database;
 import com.cloudant.client.api.model.Document;
 import com.cloudant.client.api.model.Response;
@@ -55,6 +56,12 @@ public class TopicRepository{
 
         if(topic.getNotes()==null){
             topic.setNotes(new ArrayList<>());
+        }
+
+        for(Note note:topic.getNotes()){
+            if(note.getId()==null){
+                note.setId(UUIDUtil.shortUUID());
+            }
         }
 
         db.save(topic);

@@ -1,0 +1,13 @@
+version: '3'
+services:
+  couchdb:
+    network_mode: host
+    container_name: couchdb
+    image:  apache/couchdb:2.3
+    ports:
+      - 5984:5984
+    volumes:
+      - ./volumes/couchdb:/opt/couchdb/data
+    environment:
+      COUCHDB_USER: admin
+      COUCHDB_PASSWORD: secret
